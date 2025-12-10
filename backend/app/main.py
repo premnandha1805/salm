@@ -9,8 +9,13 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Smart Academic Leave Manager")
 
-# CORS setup (allow all for deployment stability)
-origins = ["*"]
+# CORS setup
+origins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3005",
+    "https://salm-ruddy.vercel.app",
+]
 
 app.add_middleware(
     CORSMiddleware,
