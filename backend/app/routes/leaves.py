@@ -211,6 +211,12 @@ def approve_leave(
         )
 
     student.casual_balance -= days
+    
+    # Update attendance/absent days
+    if student.absent_days is None:
+        student.absent_days = 0
+    student.absent_days += days
+
     leave.status = "APPROVED"
 
     db.commit()
