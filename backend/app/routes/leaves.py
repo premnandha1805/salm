@@ -219,6 +219,7 @@ def approve_leave(
     background_tasks.add_task(
         send_leave_status_notification,
         student_name=student.name,
+        recipient_email=student.email,
         start_date=str(leave.start_date),
         end_date=str(leave.end_date),
         status="APPROVED",
@@ -261,6 +262,7 @@ def reject_leave(
     background_tasks.add_task(
         send_leave_status_notification,
         student_name=student.name,
+        recipient_email=student.email,
         start_date=str(leave.start_date),
         end_date=str(leave.end_date),
         status="REJECTED",

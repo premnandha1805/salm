@@ -60,18 +60,15 @@ def send_leave_notification(
 
 def send_leave_status_notification(
     student_name: str,
+    recipient_email: str,
     start_date: str,
     end_date: str,
     status: str,  # "APPROVED" or "REJECTED"
     reason: str | None = None,
 ):
     """
-    Sends an email to the student (using the demo email address for now)
-    notifying them of the leave status update (Approved/Rejected) and the optional reason.
+    Sends an email to the student notifying them of the leave status update.
     """
-    # DEMO PURPOSE: Sending to the same configured email (FACULTY_EMAIL) as per user request
-    # In a real app, this would be `student_email` passed as an argument.
-    recipient_email = FACULTY_EMAIL
 
     action_text = "APPROVED" if status == "APPROVED" else "REJECTED"
     subject = f"Leave Request {action_text}: {start_date} to {end_date}"
