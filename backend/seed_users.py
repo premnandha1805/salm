@@ -28,7 +28,8 @@ def seed_users():
             student.role = "STUDENT"
 
         # Seed Faculty
-        faculty_email = "faculty@college.com"
+        # Using alias to allow testing with same gmail account but unique DB entry
+        faculty_email = "premkollepara+faculty@gmail.com"
         faculty = db.query(User).filter(User.email == faculty_email).first()
         if not faculty:
             print(f"Creating faculty: {faculty_email}")

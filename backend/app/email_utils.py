@@ -9,7 +9,7 @@ SMTP_PORT = 465  # SSL
 # Read from env, fallback to provided defaults (for local dev convenience)
 SMTP_EMAIL = os.getenv("SMTP_EMAIL", "premkollepara@gmail.com")
 SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "vnlcqwfzezddsgxd")
-FACULTY_EMAIL = os.getenv("FACULTY_EMAIL", "premkollepara@gmail.com")
+FACULTY_EMAIL = os.getenv("FACULTY_EMAIL", "premkollepara+faculty@gmail.com")
 
 def _send_email(to_email: str, subject: str, body: str):
     """
