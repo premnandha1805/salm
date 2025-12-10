@@ -36,13 +36,15 @@ def seed_users():
                 name="Dr. Faculty",
                 email=faculty_email,
                 password="password123",
-                role="FACULTY"
+                role="FACULTY",
+                class_name="CS-A"
             )
             db.add(faculty)
         else:
              print(f"Faculty {faculty_email} already exists. Updating password.")
              faculty.password = "password123"
              faculty.role = "FACULTY"
+             faculty.class_name = "CS-A"
 
         db.commit()
         print("Done seeding users.")
