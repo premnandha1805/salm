@@ -9,7 +9,8 @@ def seed_users():
     db: Session = SessionLocal()
     try:
         # Seed Student
-        student_email = "prem@student.com"
+        # Using real email for notification testing
+        student_email = "premkollepara@gmail.com"
         student = db.query(User).filter(User.email == student_email).first()
         if not student:
             print(f"Creating student: {student_email}")
