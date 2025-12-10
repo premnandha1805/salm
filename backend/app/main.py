@@ -9,14 +9,8 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Smart Academic Leave Manager")
 
-# CORS setup (who is allowed to call this backend)
-origins = [
-    "http://localhost:3000",
-    "http://localhost:3001",
-    "http://localhost:3005",
-    # 🔽 after Vercel deployment, replace this with your real URL:
-    "https://srkr-leave-frontend.vercel.app",
-]
+# CORS setup (allow all for deployment stability)
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
