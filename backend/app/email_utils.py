@@ -3,17 +3,45 @@ import ssl
 from email.message import EmailMessage
 import os
 
-# TODO: In a real production app, use environment variables for secrets.
-# For now, we use the provided credentials or defaults/placeholders.
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 465  # SSL
-SMTP_EMAIL = "premkollepara@gmail.com"   
-# NOTE: The user provided a specific app password in their snippet. 
-# We should use it or a placeholder if I don't have it. 
-# Based on previous context, the user provided: "vnlc qwfz ezdd sgxd"
-SMTP_PASSWORD = "vnlc qwfz ezdd sgxd"
 
-FACULTY_EMAIL = "premkollepara@gmail.com"
+# Read from env, fallback to provided defaults (for local dev convenience)
+SMTP_EMAIL = os.getenv("SMTP_EMAIL", "premkollepara@gmail.com")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "vnlc qwfz ezdd sgxd")
+FACULTY_EMAIL = os.getenv("FACULTY_EMAIL", "premkollepara@gmail.com")
+
+def _send_email(to_email: str, subject: str, body: str):
+    """
+    Generic email sender using Gmail SMTP.
+    """
+    print("DEBUG: _send_email called")
+    print("DEBUG: to_email =", to_email)
+    print("DEBUG: subject =", subject)
+    print("DEBUG: SMTP_EMAIL =", repr(SMTP_EMAIL))
+
+    if not SMTP_EMAIL or not SMTP_PASSWORD:
+        print("DEBUG: SMTP not configured, skipping email.")
+        return
+
+    msg = EmailMessage()
+    msg["Subject"] = subject
+    msg["From"] = SMTP_EMAIL
+    msg["To"] = to_email
+    msg.set_content(body)
+
+    context = ssl.create_default_context()
+
+    try:
+        with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, context=context) as server:
+            print("DEBUG: Connecting to SMTP server")
+            server.login(SMTP_EMAIL, SMTP_PASSWORD)
+            print("DEBUG: SMTP login success")
+            server.send_message(msg)
+        print(f"DEBUG: Email sent to {to_email} with subject: {subject}")
+    except Exception as e:
+        print("ERROR: Failed to send email:", repr(e))
+
 
 def send_leave_notification(
     student_name: str,
@@ -23,10 +51,6 @@ def send_leave_notification(
     reason: str,
     auto_type: str,
 ):
-    """
-    Sends a simple email to faculty when a new leave is applied.
-    This is called as a background task from FastAPI.
-    """
     subject = f"New Leave Request from {student_name} ({class_name or 'Unknown Class'})"
     body = (
         f"Dear Faculty,\n\n"
@@ -40,22 +64,7 @@ def send_leave_notification(
         f"Regards,\n"
         f"SRKR Leave Manager System"
     )
-
-    msg = EmailMessage()
-    msg["Subject"] = subject
-    msg["From"] = SMTP_EMAIL
-    msg["To"] = FACULTY_EMAIL
-    msg.set_content(body)
-
-    context = ssl.create_default_context()
-
-    try:
-        with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, context=context) as server:
-            server.login(SMTP_EMAIL, SMTP_PASSWORD)
-            server.send_message(msg)
-        print(f"Email sent successfully to {FACULTY_EMAIL}")
-    except Exception as e:
-        print(f"Failed to send email: {e}")
+    _send_email(FACULTY_EMAIL, subject, body)
 
 
 def send_leave_status_notification(
@@ -66,14 +75,9 @@ def send_leave_status_notification(
     status: str,  # "APPROVED" or "REJECTED"
     reason: str | None = None,
 ):
-    """
-    Sends an email to the student notifying them of the leave status update.
-    """
-
     action_text = "APPROVED" if status == "APPROVED" else "REJECTED"
     subject = f"Leave Request {action_text}: {start_date} to {end_date}"
 
-    # Build the email body
     body = (
         f"Dear {student_name},\n\n"
         f"Your leave request from {start_date} to {end_date} has been {action_text}.\n\n"
@@ -83,23 +87,9 @@ def send_leave_status_notification(
         body += f"Message from Faculty:\n{reason}\n\n"
 
     body += (
-        f"You can view the details in your student portal.\n\n"
-        f"Regards,\n"
-        f"SRKR Leave Manager System"
+        "You can view the details in your student portal.\n\n"
+        "Regards,\n"
+        "SRKR Leave Manager System"
     )
 
-    msg = EmailMessage()
-    msg["Subject"] = subject
-    msg["From"] = SMTP_EMAIL
-    msg["To"] = recipient_email
-    msg.set_content(body)
-
-    context = ssl.create_default_context()
-
-    try:
-        with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, context=context) as server:
-            server.login(SMTP_EMAIL, SMTP_PASSWORD)
-            server.send_message(msg)
-        print(f"Status update email sent to {recipient_email}")
-    except Exception as e:
-        print(f"Failed to send status email: {e}")
+    _send_email(recipient_email, subject, body)
